@@ -14,14 +14,8 @@ variable "windows_admin_password" {
   sensitive   = true
 }
 
-variable "infoblox_join_token_1" {
-  description = "Join token for NIOS-X server #1"
-  type        = string
-  sensitive   = true
-}
-
-variable "infoblox_join_token_2" {
-  description = "Join token for NIOS-X server #2"
+variable "infoblox_join_token" {
+  description = "Join token for NIOS-X servers"
   type        = string
   sensitive   = true
 }

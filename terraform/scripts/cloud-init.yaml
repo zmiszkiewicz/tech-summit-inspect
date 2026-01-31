@@ -1,3 +1,0 @@
-#cloud-config
-runcmd:
-  - /opt/infoblox/host-setup/bin/host-activate --join-token "${join_token}"

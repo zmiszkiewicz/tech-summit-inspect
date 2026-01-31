@@ -1,5 +1,6 @@
 locals {
-  niosx_ami_id = "ami-08659b5070b66249d"
+  infoblox_ami_id = "ami-08659b5070b66249d"
+  join_token      = var.infoblox_join_token
 }
 
 # --- NIOS-X Server #1 (10.100.0.200) ---
@@ -28,7 +29,7 @@ resource "aws_eip_association" "niosx_1_assoc" {
 }
 
 resource "aws_instance" "niosx_1" {
-  ami           = local.niosx_ami_id
+  ami           = local.infoblox_ami_id
   instance_type = "m5.2xlarge"
   key_name      = aws_key_pair.rdp.key_name
 
@@ -37,9 +38,16 @@ resource "aws_instance" "niosx_1" {
     device_index         = 0
   }
 
-  user_data = templatefile("./scripts/cloud-init.yaml", {
-    join_token = var.infoblox_join_token_1
-  })
+  user_data = <<-EOF
+    #cloud-config
+    host_setup:
+      jointoken: "${local.join_token}"
+  EOF
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
 
   tags = {
     Name = "niosx-server-1"
@@ -74,7 +82,7 @@ resource "aws_eip_association" "niosx_2_assoc" {
 }
 
 resource "aws_instance" "niosx_2" {
-  ami           = local.niosx_ami_id
+  ami           = local.infoblox_ami_id
   instance_type = "m5.2xlarge"
   key_name      = aws_key_pair.rdp.key_name
 
@@ -83,9 +91,16 @@ resource "aws_instance" "niosx_2" {
     device_index         = 0
   }
 
-  user_data = templatefile("./scripts/cloud-init.yaml", {
-    join_token = var.infoblox_join_token_2
-  })
+  user_data = <<-EOF
+    #cloud-config
+    host_setup:
+      jointoken: "${local.join_token}"
+  EOF
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
 
   tags = {
     Name = "niosx-server-2"
