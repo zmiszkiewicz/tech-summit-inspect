@@ -59,8 +59,8 @@ resource "aws_instance" "niosx_1" {
 # --- NIOS-X Server #2 (10.100.0.201) ---
 
 resource "aws_network_interface" "niosx_2_eni" {
-  subnet_id       = aws_subnet.public.id
-  private_ips     = ["10.100.0.201"]
+  subnet_id       = aws_subnet.public_b.id
+  private_ips     = ["10.100.1.200"]
   security_groups = [aws_security_group.rdp_sg.id]
 
   tags = {
@@ -78,7 +78,7 @@ resource "aws_eip" "niosx_2_eip" {
 resource "aws_eip_association" "niosx_2_assoc" {
   network_interface_id = aws_network_interface.niosx_2_eni.id
   allocation_id        = aws_eip.niosx_2_eip.id
-  private_ip_address   = "10.100.0.201"
+  private_ip_address   = "10.100.1.200"
 }
 
 resource "aws_instance" "niosx_2" {
