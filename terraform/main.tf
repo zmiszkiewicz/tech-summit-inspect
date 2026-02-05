@@ -183,6 +183,8 @@ resource "aws_eip_association" "client_assoc" {
   network_interface_id = aws_network_interface.client_eni.id
   allocation_id        = aws_eip.client_eip.id
   private_ip_address   = "10.100.0.110"
+
+  depends_on = [aws_instance.client_vm]
 }
 
 resource "aws_instance" "client_vm" {
@@ -222,6 +224,8 @@ resource "aws_eip_association" "ubuntu_assoc" {
   network_interface_id = aws_network_interface.ubuntu_eni.id
   allocation_id        = aws_eip.ubuntu_eip.id
   private_ip_address   = "10.100.0.130"
+
+  depends_on = [aws_instance.ubuntu_vm]
 }
 
 resource "aws_instance" "ubuntu_vm" {
@@ -316,6 +320,8 @@ resource "aws_eip_association" "gm_eip_assoc" {
   network_interface_id = aws_network_interface.gm_lan1.id
   allocation_id        = aws_eip.gm_eip.id
   private_ip_address   = "10.100.0.11"
+
+  depends_on = [aws_instance.gm]
 }
 
 # ===========================================================
@@ -338,6 +344,8 @@ resource "aws_eip_association" "client_2_assoc" {
   network_interface_id = aws_network_interface.client_2_eni.id
   allocation_id        = aws_eip.client_2_eip.id
   private_ip_address   = "10.100.0.120"
+
+  depends_on = [aws_instance.client_2_vm]
 }
 
 resource "aws_instance" "client_2_vm" {
@@ -427,6 +435,8 @@ resource "aws_eip_association" "ubuntu_syslog_assoc" {
   network_interface_id = aws_network_interface.ubuntu_syslog_eni.id
   allocation_id        = aws_eip.ubuntu_syslog_eip.id
   private_ip_address   = "10.100.0.140"
+
+  depends_on = [aws_instance.ubuntu_syslog_vm]
 }
 
 resource "aws_instance" "ubuntu_syslog_vm" {
