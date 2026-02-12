@@ -17,16 +17,24 @@ def log(message):
     log_lines.append(message + "\n")
 
 # ---------------------------
-# Read FQDN + IP from file
+# Read all FQDN + IP pairs from file
 # ---------------------------
 fqdn_file = "created_fqdn.txt"
+records = []
 try:
     with open(fqdn_file, "r") as f:
-        line = f.read().strip()
-        fqdn, dc1_ip = line.split()
+        for line in f:
+            line = line.strip()
+            if line:
+                fqdn, ip = line.split()
+                records.append((fqdn, ip))
 except Exception as e:
-    log(f"❌ ERROR: Failed to read FQDN and IP from {fqdn_file}: {e}")
+    log(f"❌ ERROR: Failed to read FQDNs and IPs from {fqdn_file}: {e}")
     sys.exit(1)
+
+if not records:
+    log("⚠️  No DNS records found in file, nothing to clean up")
+    sys.exit(0)
 
 # ---------------------------
 # AWS credentials from env vars
@@ -51,35 +59,35 @@ session = boto3.Session(
 route53 = session.client("route53")
 
 # ---------------------------
-# Delete the A record
+# Delete all A records
 # ---------------------------
-log(f"🗑️  Deleting A record: {fqdn} -> {dc1_ip}")
-try:
-    response = route53.change_resource_record_sets(
-        HostedZoneId=hosted_zone_id,
-        ChangeBatch={
-            "Comment": f"Delete A record for {fqdn}",
-            "Changes": [
-                {
-                    "Action": "DELETE",
-                    "ResourceRecordSet": {
-                        "Name": fqdn,
-                        "Type": "A",
-                        "TTL": 300,
-                        "ResourceRecords": [{"Value": dc1_ip}]
+for fqdn, ip in records:
+    log(f"🗑️  Deleting A record: {fqdn} -> {ip}")
+    try:
+        response = route53.change_resource_record_sets(
+            HostedZoneId=hosted_zone_id,
+            ChangeBatch={
+                "Comment": f"Delete A record for {fqdn}",
+                "Changes": [
+                    {
+                        "Action": "DELETE",
+                        "ResourceRecordSet": {
+                            "Name": fqdn,
+                            "Type": "A",
+                            "TTL": 300,
+                            "ResourceRecords": [{"Value": ip}]
+                        }
                     }
-                }
-            ]
-        }
-    )
-    status = response['ChangeInfo']['Status']
-    log(f"✅  Deleted: {fqdn} -> {dc1_ip}")
-    log(f"📡  Change status: {status}")
-except route53.exceptions.InvalidChangeBatch as e:
-    log(f"⚠️  Record {fqdn} may not exist or already deleted: {e}")
-except Exception as e:
-    log(f"❌ Failed to delete A record {fqdn}: {e}")
-    sys.exit(1)
+                ]
+            }
+        )
+        status = response['ChangeInfo']['Status']
+        log(f"✅  Deleted: {fqdn} -> {ip}")
+        log(f"📡  Change status: {status}")
+    except route53.exceptions.InvalidChangeBatch as e:
+        log(f"⚠️  Record {fqdn} may not exist or already deleted: {e}")
+    except Exception as e:
+        log(f"❌ Failed to delete A record {fqdn}: {e}")
 
 # ---------------------------
 # Write cleanup log
