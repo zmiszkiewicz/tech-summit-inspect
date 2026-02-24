@@ -35,6 +35,7 @@ participant_id = os.getenv("INSTRUQT_PARTICIPANT_ID")
 dc1_ip = os.getenv("DC1_IP")
 client_2_ip = os.getenv("CLIENT_2_IP")
 gm_ip = os.getenv("GM_IP")
+gm2_ip = os.getenv("GM2_IP")
 azure_win11_ip = os.getenv("AZURE_WIN11_IP")
 azure_win11_2_ip = os.getenv("AZURE_WIN11_2_IP")
 
@@ -52,6 +53,9 @@ if not client_2_ip:
 if not gm_ip:
     log("⚠️  WARNING: GM_IP is not set, skipping infoblox GM DNS record")
 
+if not gm2_ip:
+    log("⚠️  WARNING: GM2_IP is not set, skipping infoblox GM2 DNS record")
+
 if not azure_win11_ip:
     log("⚠️  WARNING: AZURE_WIN11_IP is not set, skipping Azure Win11 DNS record")
 
@@ -64,6 +68,7 @@ if not azure_win11_2_ip:
 fqdn_dc1 = f"{participant_id}-client.iracictechguru.com."
 fqdn_client2 = f"{participant_id}-client2.iracictechguru.com."
 fqdn_gm = f"{participant_id}-infoblox.iracictechguru.com."
+fqdn_gm2 = f"{participant_id}-infoblox2.iracictechguru.com."
 fqdn_azure_win11 = f"{participant_id}-client3-azure.iracictechguru.com."
 fqdn_azure_win11_2 = f"{participant_id}-client4-azure.iracictechguru.com."
 
@@ -171,6 +176,37 @@ if gm_ip:
         sys.exit(1)
 
 # ---------------------------
+# Create A record for NIOS GM2
+# ---------------------------
+if gm2_ip:
+    log(f"➡️  Creating A record: {fqdn_gm2} -> {gm2_ip}")
+    try:
+        response = route53.change_resource_record_sets(
+            HostedZoneId=hosted_zone_id,
+            ChangeBatch={
+                "Comment": f"Upsert A record for {fqdn_gm2}",
+                "Changes": [
+                    {
+                        "Action": "UPSERT",
+                        "ResourceRecordSet": {
+                            "Name": fqdn_gm2,
+                            "Type": "A",
+                            "TTL": 300,
+                            "ResourceRecords": [{"Value": gm2_ip}]
+                        }
+                    }
+                ]
+            }
+        )
+        status = response['ChangeInfo']['Status']
+        log(f"✅  A record created: {fqdn_gm2} -> {gm2_ip}")
+        log(f"📡  Change status: {status}")
+
+    except Exception as e:
+        log(f"❌ Failed to create A record {fqdn_gm2}: {e}")
+        sys.exit(1)
+
+# ---------------------------
 # Create A record for Azure Win11 Client
 # ---------------------------
 if azure_win11_ip:
@@ -242,6 +278,8 @@ with open(fqdn_file, "w") as f:
         f.write(f"{fqdn_client2} {client_2_ip}\n")
     if gm_ip:
         f.write(f"{fqdn_gm} {gm_ip}\n")
+    if gm2_ip:
+        f.write(f"{fqdn_gm2} {gm2_ip}\n")
     if azure_win11_ip:
         f.write(f"{fqdn_azure_win11} {azure_win11_ip}\n")
     if azure_win11_2_ip:

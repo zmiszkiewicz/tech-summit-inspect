@@ -16,6 +16,11 @@ provider "aws" {
   region = var.aws_region
 }
 
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+}
+
 provider "azurerm" {
   features {}
   skip_provider_registration = true
