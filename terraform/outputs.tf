@@ -16,12 +16,12 @@ output "ssh_to_ubuntu" {
 
 output "niosx_1_public_ip" {
   description = "Public IP of NIOS-X server #1"
-  value       = aws_eip.niosx_1_eip.public_ip
+  value       = aws_instance.niosx_1.public_ip
 }
 
 output "niosx_2_public_ip" {
   description = "Public IP of NIOS-X server #2"
-  value       = aws_eip.niosx_2_eip.public_ip
+  value       = aws_instance.niosx_2.public_ip
 }
 
 output "gm_public_ip" {
