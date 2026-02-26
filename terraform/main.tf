@@ -274,7 +274,7 @@ resource "aws_instance" "ubuntu_vm" {
 # ===========================================================
 
 locals {
-  gm_ami_id = "ami-008772a29d4c2f558"
+  gm_ami_id = "ami-0f223da0ec214a840"
 }
 
 # --- GM Management Network Interface (10.100.0.10) ---
