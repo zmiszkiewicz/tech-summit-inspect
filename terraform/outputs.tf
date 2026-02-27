@@ -44,11 +44,6 @@ output "ssh_to_ubuntu_syslog" {
   value       = "ssh -i instruqt-dc-key.pem ubuntu@${aws_eip.ubuntu_syslog_eip.public_ip}"
 }
 
-output "gm2_public_ip" {
-  description = "Public IP of NIOS Grid Master #2 (GM2) in us-east-1"
-  value       = aws_eip.gm2_eip.public_ip
-}
-
 # --- Azure Outputs ---
 
 output "azure_win11_public_ip" {
